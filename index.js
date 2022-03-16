@@ -1,7 +1,6 @@
 const fs = require('fs');
 
 let logPath = '../haproxy.log';
-let log = fs.readFileSync(logPath, 'utf8');
 
 function diffStrings(str1, str2) {
   let diff = '';
@@ -22,9 +21,7 @@ function diffStrings(str1, str2) {
 }
 
 fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, (curr, prev) => {
-  let newLog = fs.readFileSync(logPath, 'utf8');
-  // diff the two strings and send the diff to the client
-  let diff = diffStrings(log, newLog);
-  console.log(diff);
-  log = newLog;
+  let log = fs.readFileSync(logPath, 'utf8');
+  console.log(log); 
+  fs.writeFileSync('../haproxy.diff', '');
 });
