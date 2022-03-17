@@ -235,10 +235,10 @@ export default {
   cursor: pointer;
 }
 .all .table-row {
-  grid-template-columns: 180px 130px 155px 70px 80px 120px 64px auto auto;
+  grid-template-columns: 180px 140px 200px 70px 80px 120px 60px auto auto;
 }
 .focus .table-row {
-  grid-template-columns: 180px 130px 155px 70px 80px auto auto;
+  grid-template-columns: 180px 140px 200px 70px 80px auto auto;
 }
 .focus .ip {
   cursor: pointer;
