@@ -265,7 +265,7 @@ export default {
   border-radius: 7px;
   padding: 6px 0px;
 }
-.refresh:hover, .search-button:hover {
+.refresh:hover, .search-button:hover, .close:hover {
   color: #808080;
 }
 .close {
