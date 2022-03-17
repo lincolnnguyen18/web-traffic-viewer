@@ -94,7 +94,8 @@ fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, async (curr
       let Tc = parsed[6];
       let Tr = parsed[7];
       let Ta = parsed[8];
-      console.log(Tt, Tq, Tw, Tc, Tr, Ta)
+      let TR = parsed[9];
+      console.log(Tt, Tq, Tw, Tc, Tr, Ta, TR);
       let appName = `${app}: ${getAppName(app)}`;
       let bytes = parsed[4];
       // console.log(ip, path, time, appName, bytes);
@@ -104,7 +105,7 @@ fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, async (curr
       if (!(appName in visits[ip]['apps'])) {
         visits[ip]['apps'][appName] = [];
       }
-      visits[ip]['apps'][appName].push({ path: path, time: Tq, bytes: bytes });
+      visits[ip]['apps'][appName].push({ path: path, time: Tt, bytes: bytes });
     });
     let ips = Object.keys(visits);
     let fetchArray = [];
