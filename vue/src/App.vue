@@ -5,6 +5,7 @@ export default {
   data() {
     return {
       currentPage: 'all',
+      // pages: ['all', 'countries']
       pages: ['all', 'countries']
     }
   },
@@ -25,14 +26,15 @@ export default {
 </script>
 
 <template>
-<div class="buttons">
+<h1 class="header">Web Traffic Viewer</h1>
+<!-- <div class="buttons">
   <span
     v-for="page in pages"
     :key="page"
     @click="currentPage = page"
     :class="['material-icons-round', { active: currentPage === page }]"
   >{{ page_icon(page) }}</span>
-</div>
+</div> -->
 <component :is="currentPage"></component>
 </template>
 
@@ -47,16 +49,18 @@ html, body, #app {
 }
 #app {
   display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .buttons {
   position: absolute;
-  bottom: 0;
-  left: 0;
+  top: 0;
+  right: 0;
   color: #bbb;
   display: flex;
   gap: 16px;
-  margin-left: 16px;
-  margin-bottom: 16px;
+  margin-top: 16px;
+  margin-right: 16px;
 }
 .buttons span {
   font-size: 32px;
@@ -65,5 +69,10 @@ html, body, #app {
 }
 .active {
   color: #000;
+}
+</style>
+<style scoped>
+.header {
+  user-select: none;
 }
 </style>
