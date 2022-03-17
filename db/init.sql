@@ -41,7 +41,7 @@ DELIMITER //
 
 CREATE PROCEDURE insert_visit(_ip TEXT, _app TEXT, _country TEXT, _region TEXT, _city TEXT, _time TEXT, _bytes INTEGER, _path TEXT) BEGIN
   -- get id of visit with same values created in past minute
-  SET @visit_id := (SELECT id FROM visit WHERE ip = _ip AND app = _app AND date > DATE_SUB(NOW(), INTERVAL 1 MINUTE));
+  SET @visit_id := (SELECT id FROM visit WHERE ip = _ip AND app = _app AND date > DATE_SUB(NOW(), INTERVAL 5 MINUTE));
   -- if visit_id doesn't exist then insert new visit
   IF @visit_id IS NULL THEN
     INSERT INTO visit (ip, app, country, region, city) VALUES (_ip, _app, _country, _region, _city);
