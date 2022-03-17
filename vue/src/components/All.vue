@@ -1,11 +1,13 @@
 <script>
+import Loading from './Loading.vue'
 export default {
   data() {
     return {
       search: '',
       mode: 'all',
       visitors: [],
-      details: []
+      details: [],
+      refreshing: false,
     }
   },
   methods: {
@@ -19,7 +21,7 @@ export default {
       }
     },
     loadMoreVisits: async function () {
-      fetch(`http://localhost:1241/getVisits?lastId=${this.visitors[this.visitors.length - 1].id}&search=${this.search}`)
+      fetch(`https://demo10.lincolnnguyen18.com/getVisits?lastId=${this.visitors[this.visitors.length - 1].id}&search=${this.search}`)
         .then(res => res.json())
         .then(data => {
           data = this.reformatVisits(data)
@@ -68,7 +70,7 @@ export default {
     },
     focusOnVisit(visitId, ip, app) {
       // console.log(`visitId: ${visitId}`)
-      fetch(`http://localhost:1241/getDetails?visitId=${visitId}`)
+      fetch(`https://demo10.lincolnnguyen18.com/getDetails?visitId=${visitId}`)
         .then(res => res.json())
         .then(data => {
           data = this.reformatDetails(data)
@@ -85,8 +87,8 @@ export default {
       console.log(`opening ip: ${ip}`)
       window.open(`https://ipinfo.io/${ip}`)
     },
-    loadVisits() {
-      fetch(`http://localhost:1241/getVisits?search=${this.search}`)
+    loadVisits: async function () {
+      await fetch(`https://demo10.lincolnnguyen18.com/getVisits?search=${this.search}`)
       .then(response => response.json())
       .then(data => {
         data = this.reformatVisits(data)
@@ -98,6 +100,13 @@ export default {
       if (this.search === '') {
         this.loadVisits()
       }
+    },
+    refresh: async function () {
+      this.refreshing = true
+      setTimeout(async () => {
+        await this.loadVisits()
+        this.refreshing = false
+      }, 1000)
     }
   },
   mounted() {
@@ -108,7 +117,8 @@ export default {
         this.setMode('all')
       }
     })
-  }
+  },
+  components: { Loading }
 }
 </script>
 
@@ -127,18 +137,19 @@ export default {
     <span>Country</span>
     <span>Region</span>
     <span>City</span>
-    <span class="material-icons-round refresh" @click="loadVisits">refresh</span>
+    <span class="material-icons-round refresh" @click="refresh" v-if="!refreshing">refresh</span>
+    <Loading size=20 borderThickness=3 v-if="refreshing" class="refreshing" />
   </div>
   <div class="table-rows" @scroll="onScroll">
     <div class="table-row table-row-only" v-for="visitor in visitors" :key="visitor.id">
-      <span>{{visitor.date}}</span>
-      <span @click="openIp(visitor.ip)" class="ip">{{visitor.ip}}</span>
+      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.date}}</span>
+      <span @click="openIp(visitor.ip)">{{visitor.ip}}</span>
       <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.app}}</span>
-      <span>{{visitor.time}}</span>
-      <span>{{visitor.bytes}}</span>
-      <span>{{visitor.country}}</span>
-      <span>{{visitor.region}}</span>
-      <span>{{visitor.city}}</span>
+      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.time}}</span>
+      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.bytes}}</span>
+      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.country}}</span>
+      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.region}}</span>
+      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.city}}</span>
     </div>
   </div>
 </div>
@@ -266,6 +277,10 @@ export default {
   justify-self: flex-end;
   user-select: none;
   cursor: pointer;
+}
+.refreshing {
+  justify-self: flex-end;
+  align-self: center;
 }
 .path {
   word-break: break-all;

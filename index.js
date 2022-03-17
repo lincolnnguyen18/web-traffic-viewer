@@ -13,6 +13,8 @@ const conn = mysql.createConnection({
   database: 'web_traffic_viewer',
   multipleStatements: true
 });
+import path from 'path';
+const __dirname = path.resolve();
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -23,11 +25,11 @@ const ping = () => {
   conn.query('SELECT 1');
 }
 
-// ping mysql server to keep connection alive every 10 minutes
+// ping mysql server to keep connection alive every 1 minute
 ping();
 setInterval(() => {
   ping();
-}, 600000);
+}, 60000);
 
 function getPosition(string, subString, index) {
   return string.split(subString, index).join(subString).length;
@@ -53,6 +55,8 @@ function getAppName(app) {
       return `ip and address lookup`;
     case 'd9':
       return `rapid-tracing2`;
+    case 'd10':
+      return 'web-traffic-viewer';
     default:
       return `unknown`;
   }
@@ -194,5 +198,5 @@ app.get('/getDetails', (req, res) => {
   }
 });
 
-const port = 1241;
+const port = 7008;
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
