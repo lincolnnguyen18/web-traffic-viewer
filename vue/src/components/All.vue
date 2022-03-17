@@ -8,6 +8,7 @@ export default {
       visitors: [],
       details: [],
       refreshing: false,
+      altDown: false
     }
   },
   methods: {
@@ -70,18 +71,24 @@ export default {
     },
     focusOnVisit(visitId, ip, app) {
       // console.log(`visitId: ${visitId}`)
-      fetch(`https://demo10.lincolnnguyen18.com/getDetails?visitId=${visitId}`)
-        .then(res => res.json())
-        .then(data => {
-          data = this.reformatDetails(data)
-          console.log(data)
-          this.details = data
-          data.forEach(detail => {
-            detail.ip = ip
-            detail.app = app
+      console.log(this.altDown)
+      if (!this.altDown) {
+        fetch(`https://demo10.lincolnnguyen18.com/getDetails?visitId=${visitId}`)
+          .then(res => res.json())
+          .then(data => {
+            data = this.reformatDetails(data)
+            console.log(data)
+            this.details = data
+            data.forEach(detail => {
+              detail.ip = ip
+              detail.app = app
+            })
+            this.setMode('focus')
           })
-          this.setMode('focus')
-        })
+      } else {
+        this.openIp(ip)
+        this.altDown = false
+      }
     },
     focusSearch() {
       this.$refs.search.classList.toggle('focus-search');
@@ -118,6 +125,13 @@ export default {
     document.addEventListener('keyup', e => {
       if (e.key == 'Escape') {
         this.setMode('all')
+      } else if (e.key == 'Alt') {
+        this.altDown = false
+      }
+    })
+    document.addEventListener('keydown', e => {
+      if (e.key == 'Alt') {
+        this.altDown = true
       }
     })
   },
@@ -150,15 +164,15 @@ export default {
     <Loading size=20 borderThickness=3 v-if="refreshing" class="refreshing" />
   </div>
   <div class="table-rows" @scroll="onScroll">
-    <div class="table-row table-row-only" v-for="visitor in visitors" :key="visitor.id">
-      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.date}}</span>
-      <span @click="openIp(visitor.ip)">{{visitor.ip}}</span>
-      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.app}}</span>
-      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.time}}</span>
-      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.bytes}}</span>
-      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.country}}</span>
-      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.region}}</span>
-      <span @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">{{visitor.city}}</span>
+    <div class="table-row table-row-only" v-for="visitor in visitors" :key="visitor.id" @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">
+      <span>{{visitor.date}}</span>
+      <span>{{visitor.ip}}</span>
+      <span>{{visitor.app}}</span>
+      <span>{{visitor.time}}</span>
+      <span>{{visitor.bytes}}</span>
+      <span>{{visitor.country}}</span>
+      <span>{{visitor.region}}</span>
+      <span>{{visitor.city}}</span>
     </div>
   </div>
 </div>
