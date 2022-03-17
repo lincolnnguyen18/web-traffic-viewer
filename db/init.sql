@@ -46,10 +46,10 @@ CREATE PROCEDURE insert_visit(_ip TEXT, _app TEXT, _country TEXT, _region TEXT, 
   IF @visit_id IS NULL THEN
     INSERT INTO visit (ip, app, country, region, city) VALUES (_ip, _app, _country, _region, _city);
     SET @visit_id := LAST_INSERT_ID();
+  ELSE
+    -- else update visit with new time and bytes
+    UPDATE visit SET time = _time, bytes = bytes + _bytes WHERE id = @visit_id;
   END IF;
-  -- update visit with new time and bytes
-  -- set time to max of old time and _time
-  UPDATE visit SET time = IF(time > _time, time, _time), bytes = bytes + _bytes WHERE id = @visit_id;
   -- insert new detail
   INSERT INTO detail (time, bytes, path) VALUES (_time, _bytes, _path);
   SET @detail_id := LAST_INSERT_ID();
