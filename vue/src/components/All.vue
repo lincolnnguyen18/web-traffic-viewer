@@ -200,6 +200,7 @@ export default {
   height: 100%;
   width: 100%;
   padding: 10px;
+  border-radius: 7px;
   color: #333;
 }
 .search span {
