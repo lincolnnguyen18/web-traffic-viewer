@@ -176,7 +176,7 @@ export default {
     <span>Region</span>
     <span>City</span>
     <span class="material-icons-round refresh" @click="refresh" v-if="!refreshing">refresh</span>
-    <Loading size=17 borderThickness=2.5 v-if="refreshing" class="refreshing" />
+    <Loading size=17 borderThickness=2.6 v-if="refreshing" class="refreshing" />
   </div>
   <div class="table-rows" @scroll="onScroll" ref="table">
     <div class="table-row table-row-only" v-for="visitor in visitors" :key="visitor.id" @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">
