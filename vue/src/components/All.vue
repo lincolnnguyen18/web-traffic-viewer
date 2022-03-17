@@ -154,10 +154,10 @@ export default {
 </script>
 
 <template>
-<div class="search" ref="search" :class="{'focus-search': searchFocused}">
+<div class="search" ref="search" :class="{'focus-search': searchFocused, 'disabled': this.mode === 'focus'}">
   <span class="material-icons-round search-button" @click="loadVisits">search</span>
   <input type="search" placeholder="Search" v-model="search" @keyup.enter="loadVisits" @submit.prevent="loadVisits" @input="checkEmptySearch" @focus="focusSearch" @blur="focusSearch" ref="searchInput">
-  <span class="material-icons-round search-button" @click="clearSearch" ref="clear" :class="{'hidden': search === ''}">close</span>
+  <span class="material-icons-round search-button clear" @click="clearSearch" ref="clear" :class="{'hidden': search === ''}">close</span>
 </div>
 <div class="all" v-show="mode == 'all'">
   <div class="table-row table-header">
@@ -176,7 +176,7 @@ export default {
     <span>Region</span>
     <span>City</span>
     <span class="material-icons-round refresh" @click="refresh" v-if="!refreshing">refresh</span>
-    <Loading size=20 borderThickness=3 v-if="refreshing" class="refreshing" />
+    <Loading size=17 borderThickness=2.5 v-if="refreshing" class="refreshing" />
   </div>
   <div class="table-rows" @scroll="onScroll" ref="table">
     <div class="table-row table-row-only" v-for="visitor in visitors" :key="visitor.id" @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">
@@ -246,7 +246,7 @@ input[type="search"]::-webkit-search-results-decoration {
   visibility: hidden;
 }
 .search span {
-  font-size: 28px;
+  font-size: 24px;
   user-select: none;
   cursor: pointer;
   width: 60px;
@@ -263,6 +263,9 @@ input[type="search"]::-webkit-search-results-decoration {
   display: flex;
   align-items: center;
 }
+/* .clear {
+  font-size: 24px!important;
+} */
 .table-row {
   display: grid;
   padding: 0 24px;
@@ -324,6 +327,8 @@ input[type="search"]::-webkit-search-results-decoration {
 .refreshing {
   justify-self: flex-end;
   align-self: center;
+  margin-right: 3px;
+  margin-top: 2px;
 }
 .path {
   word-break: break-all;
@@ -332,5 +337,10 @@ input[type="search"]::-webkit-search-results-decoration {
   background: #ffffff;
   transition: background 0.2s;
   outline: 1px solid #bbb;
+}
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  user-select: none;
 }
 </style>
