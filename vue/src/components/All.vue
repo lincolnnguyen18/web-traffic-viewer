@@ -83,6 +83,9 @@ export default {
           this.setMode('focus')
         })
     },
+    focusSearch() {
+      this.$refs.search.classList.toggle('focus-search');
+    },
     openIp(ip) {
       console.log(`opening ip: ${ip}`)
       window.open(`https://ipinfo.io/${ip}`)
@@ -123,18 +126,24 @@ export default {
 </script>
 
 <template>
-<div class="search">
-  <input type="search" placeholder="Search" v-model="search" @keyup.enter="loadVisits" @submit.prevent="loadVisits" @input="checkEmptySearch">
+<div class="search" ref="search">
+  <input type="search" placeholder="Search" v-model="search" @keyup.enter="loadVisits" @submit.prevent="loadVisits" @input="checkEmptySearch" @focus="focusSearch" @blur="focusSearch" />
   <span class="material-icons-round search-button" @click="loadVisits">search</span>
 </div>
 <div class="all" v-show="mode == 'all'">
   <div class="table-row table-header">
-    <span>Date</span>
+    <span>
+      Date
+      <span class="material-icons-outlined">arrow_drop_down</span>
+    </span>
     <span>IP</span>
     <span>App</span>
     <span>Time (s)</span>
     <span>Size</span>
-    <span>Country</span>
+    <span>
+      Country
+      <!-- <span class="material-icons-outlined">arrow_drop_down</span> -->
+    </span>
     <span>Region</span>
     <span>City</span>
     <span class="material-icons-round refresh" @click="refresh" v-if="!refreshing">refresh</span>
@@ -202,6 +211,7 @@ export default {
   padding: 10px;
   border-radius: 7px;
   color: #333;
+  outline: none;
 }
 .search span {
   font-size: 28px;
@@ -285,5 +295,10 @@ export default {
 }
 .path {
   word-break: break-all;
+}
+.focus-search {
+  background: #f7f7f7;
+  transition: background 0.2s;
+  outline: 1px solid #e0e0e0;
 }
 </style>

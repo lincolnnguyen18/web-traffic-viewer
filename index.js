@@ -42,7 +42,7 @@ function getAppName(app) {
     case 'd1':
       return `weeread`;
     case 'd3':
-      return `weespeak`;
+      return `decaminute`;
     case 'd4':
       return `weespeak2`;
     case 'd5':
