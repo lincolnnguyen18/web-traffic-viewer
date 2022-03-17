@@ -37,19 +37,30 @@ CREATE TABLE visit_details (
     ON UPDATE CASCADE
 );
 
+CREATE VIEW ips_by_total_visits AS
+  SELECT row_number() OVER (ORDER BY results.total_visits ASC) AS id, results.ip, results.total_visits, results.country, results.region, results.city FROM
+    (SELECT DISTINCT ip_visits.ip, ip_visits.total_visits, visit.country, visit.region, visit.city FROM
+      (SELECT ip, COUNT(*) AS total_visits FROM visit GROUP BY ip) AS ip_visits
+    JOIN visit ON visit.ip = ip_visits.ip
+    ORDER BY total_visits DESC) AS results;
+
+-- CREATE VIEW ips_by_total_visits AS
+--   SELECT DISTINCT ip_visits.ip, ip_visits.total_visits, visit.country, visit.region, visit.city FROM
+--     (SELECT ip, COUNT(*) AS total_visits FROM visit GROUP BY ip) AS ip_visits
+--   JOIN visit ON visit.ip = ip_visits.ip;
+
 DELIMITER //
 
 CREATE PROCEDURE insert_visit(_ip TEXT, _app TEXT, _country TEXT, _region TEXT, _city TEXT, _time TEXT, _bytes INTEGER, _path TEXT) BEGIN
-  -- get id of visit with same values created in past minute
-  SET @visit_id := (SELECT id FROM visit WHERE ip = _ip AND app = _app AND date > DATE_SUB(NOW(), INTERVAL 5 MINUTE));
+  -- get id of visit with same values created in past hour
+  SET @visit_id := (SELECT id FROM visit WHERE ip = _ip AND app = _app AND date > DATE_SUB(NOW(), INTERVAL 1 HOUR) ORDER BY id DESC LIMIT 1);
   -- if visit_id doesn't exist then insert new visit
   IF @visit_id IS NULL THEN
     INSERT INTO visit (ip, app, country, region, city) VALUES (_ip, _app, _country, _region, _city);
     SET @visit_id := LAST_INSERT_ID();
-  ELSE
-    -- else update visit with new time and bytes
-    UPDATE visit SET time = _time, bytes = bytes + _bytes WHERE id = @visit_id;
   END IF;
+  -- update visit by setting time to max of time and _time, date to current time stamp and bytes to bytes + _bytes
+  UPDATE visit SET time = IF(time > _time, time, _time), date = NOW(), bytes = bytes + _bytes WHERE id = @visit_id;
   -- insert new detail
   INSERT INTO detail (time, bytes, path) VALUES (_time, _bytes, _path);
   SET @detail_id := LAST_INSERT_ID();
@@ -77,6 +88,28 @@ END//
 
 CREATE PROCEDURE get_details(_visit_id INTEGER) BEGIN
   SELECT * FROM detail JOIN visit_details ON visit_details.detail_id = detail.id WHERE visit_details.visit_id = _visit_id ORDER BY detail.id DESC;
+END//
+
+CREATE PROCEDURE get_ips_by_total_visits(_order_direction TEXT, _continue_id INTEGER) BEGIN
+  -- if order direction is ASC then order by ASC
+  IF _order_direction = "ASC" THEN
+    -- if continue id is 0 then get all ips
+    IF _continue_id = 0 THEN
+      SELECT * FROM ips_by_total_visits ORDER BY id ASC LIMIT 15;
+    ELSE
+      -- get all ips with id greater than continue id
+      SELECT * FROM ips_by_total_visits WHERE id < _continue_id ORDER BY id ASC LIMIT 15;
+    END IF;
+  ELSE
+    -- if order direction is DESC then order by DESC
+    -- if continue id is 0 then get all ips
+    IF _continue_id = 0 THEN
+      SELECT * FROM ips_by_total_visits ORDER BY id DESC LIMIT 15;
+    ELSE
+      -- get all ips with id greater than continue id
+      SELECT * FROM ips_by_total_visits WHERE id < _continue_id ORDER BY id DESC LIMIT 15;
+    END IF;
+  END IF;
 END//
 
 DELIMITER ;
