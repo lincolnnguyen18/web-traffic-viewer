@@ -9,6 +9,7 @@ USE web_traffic_viewer;
 CREATE TABLE visit (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  most_recent_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   ip TEXT,
   app TEXT,
   country TEXT,
@@ -53,14 +54,14 @@ DELIMITER //
 
 CREATE PROCEDURE insert_visit(_ip TEXT, _app TEXT, _country TEXT, _region TEXT, _city TEXT, _time TEXT, _bytes INTEGER, _path TEXT) BEGIN
   -- get id of visit with same values created in past hour
-  SET @visit_id := (SELECT id FROM visit WHERE ip = _ip AND app = _app AND date > DATE_SUB(NOW(), INTERVAL 1 HOUR) ORDER BY id DESC LIMIT 1);
+  SET @visit_id := (SELECT id FROM visit WHERE ip = _ip AND app = _app AND most_recent_date > DATE_SUB(NOW(), INTERVAL 1 HOUR) ORDER BY id DESC LIMIT 1);
   -- if visit_id doesn't exist then insert new visit
   IF @visit_id IS NULL THEN
     INSERT INTO visit (ip, app, country, region, city) VALUES (_ip, _app, _country, _region, _city);
     SET @visit_id := LAST_INSERT_ID();
   END IF;
   -- update visit by setting time to max of time and _time, date to current time stamp and bytes to bytes + _bytes
-  UPDATE visit SET time = IF(time > _time, time, _time), date = NOW(), bytes = bytes + _bytes WHERE id = @visit_id;
+  UPDATE visit SET time = IF(time > _time, time, _time), most_recent_date = NOW(), bytes = bytes + _bytes WHERE id = @visit_id;
   -- insert new detail
   INSERT INTO detail (time, bytes, path) VALUES (_time, _bytes, _path);
   SET @detail_id := LAST_INSERT_ID();
