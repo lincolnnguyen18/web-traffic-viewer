@@ -91,6 +91,7 @@ CREATE PROCEDURE get_details(_visit_id INTEGER) BEGIN
   SELECT * FROM detail JOIN visit_details ON visit_details.detail_id = detail.id WHERE visit_details.visit_id = _visit_id ORDER BY detail.id DESC;
 END//
 
+-- call get_ips_by_total_visits('desc', 0);
 CREATE PROCEDURE get_ips_by_total_visits(_order_direction TEXT, _continue_id INTEGER) BEGIN
   -- if order direction is ASC then order by ASC
   IF _order_direction = "ASC" THEN

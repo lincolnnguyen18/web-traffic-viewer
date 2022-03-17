@@ -8,10 +8,15 @@ export default {
       visitors: [],
       details: [],
       refreshing: false,
-      altDown: false
+      altDown: false,
+      searchFocused: false
     }
   },
   methods: {
+    clearSearch() {
+      this.search = ''
+      this.$refs.searchInput.focus()
+    },
     setMode(mode) {
       this.mode = mode
     },
@@ -91,7 +96,13 @@ export default {
       }
     },
     focusSearch() {
-      this.$refs.search.classList.toggle('focus-search');
+      if (!this.searchFocused) {
+        this.searchFocused = true
+        this.$refs.searchInput.focus()
+      } else {
+        this.searchFocused = false
+        this.$refs.searchInput.blur()
+      }
     },
     openIp(ip) {
       console.log(`opening ip: ${ip}`)
@@ -116,6 +127,7 @@ export default {
       setTimeout(async () => {
         await this.loadVisits()
         this.refreshing = false
+        this.$refs.table.scrollTop = 0
       }, 1000)
     }
   },
@@ -140,9 +152,10 @@ export default {
 </script>
 
 <template>
-<div class="search" ref="search">
-  <input type="search" placeholder="Search" v-model="search" @keyup.enter="loadVisits" @submit.prevent="loadVisits" @input="checkEmptySearch" @focus="focusSearch" @blur="focusSearch" />
+<div class="search" ref="search" :class="{'focus-search': searchFocused}">
   <span class="material-icons-round search-button" @click="loadVisits">search</span>
+  <input type="search" placeholder="Search" v-model="search" @keyup.enter="loadVisits" @submit.prevent="loadVisits" @input="checkEmptySearch" @focus="focusSearch" @blur="focusSearch" ref="searchInput">
+  <span class="material-icons-round search-button" @click="clearSearch" ref="clear" :class="{'hidden': search === ''}">close</span>
 </div>
 <div class="all" v-show="mode == 'all'">
   <div class="table-row table-header">
@@ -163,7 +176,7 @@ export default {
     <span class="material-icons-round refresh" @click="refresh" v-if="!refreshing">refresh</span>
     <Loading size=20 borderThickness=3 v-if="refreshing" class="refreshing" />
   </div>
-  <div class="table-rows" @scroll="onScroll">
+  <div class="table-rows" @scroll="onScroll" ref="table">
     <div class="table-row table-row-only" v-for="visitor in visitors" :key="visitor.id" @click="focusOnVisit(visitor.id, visitor.ip, visitor.app)">
       <span>{{visitor.date}}</span>
       <span>{{visitor.ip}}</span>
@@ -187,13 +200,6 @@ export default {
     <span class="material-icons-outlined close" @click="setMode('all')">close</span>
   </div>
   <div class="table-rows">
-    <!-- <div class="table-row table-row-only">
-      <span>129.49.100.88</span>
-      <span>d9: rapid tracing</span>
-      <span>4.5</span>
-      <span>235</span>
-      <span>/shared/1/library/m5yw15/thum...</span>
-    </div> -->
     <div class="table-row table-row-only" v-for="detail in details" :key="detail.id">
       <span>{{detail.date}}</span>
       <span class="ip" @click="openIp(detail.ip)">{{detail.ip}}</span>
@@ -223,9 +229,19 @@ export default {
   height: 100%;
   width: 100%;
   padding: 10px;
+  padding-left: 0;
   border-radius: 7px;
   color: #333;
   outline: none;
+}
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance:none;
+}
+.hidden {
+  visibility: hidden;
 }
 .search span {
   font-size: 28px;
@@ -311,8 +327,8 @@ export default {
   word-break: break-all;
 }
 .focus-search {
-  background: #f7f7f7;
+  background: #ffffff;
   transition: background 0.2s;
-  outline: 1px solid #e0e0e0;
+  outline: 1px solid #bbb;
 }
 </style>
