@@ -16,6 +16,8 @@ export default {
     clearSearch() {
       this.search = ''
       this.$refs.searchInput.focus()
+      this.loadVisits();
+      this.$refs.table.scrollTop = 0
     },
     setMode(mode) {
       this.mode = mode
