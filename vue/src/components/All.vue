@@ -168,7 +168,7 @@ export default {
   <div class="table-row table-header">
     <span>
       Date
-      <span class="material-icons-outlined">arrow_drop_down</span>
+      <!-- <span class="material-icons-outlined">arrow_drop_down</span> -->
     </span>
     <span>IP</span>
     <span>App</span>
