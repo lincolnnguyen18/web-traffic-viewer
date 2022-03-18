@@ -205,7 +205,7 @@ app.get('/getDetails', (req, res) => {
   }
 });
 
-app.get('/getMap', (req, res) => {
+const writeMap = () => {
   conn.execute('CALL get_latitude_longitude_past_month()', (err, results, fields) => {
     if (err) {
       console.log(`error: ${err}`);
@@ -228,10 +228,15 @@ app.get('/getMap', (req, res) => {
         backgroundColor: '#000',
         // backgroundColor: '#fff',
       });
-      res.send(svgMap);
+      fs.writeFileSync('public/map.svg', svgMap);
     }
   });
-});
+}
+
+writeMap();
+setInterval(() => {
+  writeMap();
+}, 1000 * 60 * 60);
 
 const port = 7008;
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
