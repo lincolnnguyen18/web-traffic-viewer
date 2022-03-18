@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 const ping = () => {
-  console.log('pinging mysql server; date: ' + new Date());
+  // console.log('pinging mysql server; date: ' + new Date());
   conn.query('SELECT 1');
 }
 
@@ -95,7 +95,7 @@ fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, async (curr
       let Tr = parsed[7];
       let Ta = parsed[8];
       let TR = parsed[9];
-      console.log(Tt, Tq, Tw, Tc, Tr, Ta, TR);
+      // console.log(Tt, Tq, Tw, Tc, Tr, Ta, TR);
       let appName = `${app}: ${getAppName(app)}`;
       let bytes = parsed[4];
       // console.log(ip, path, time, appName, bytes);
@@ -123,7 +123,7 @@ fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, async (curr
       visits[ip].city = city;
       visits[ip].region = region;
     });
-    console.log(util.inspect(visits, false, null, true));
+    // console.log(util.inspect(visits, false, null, true));
     Object.keys(visits).forEach(ip => {
       // console.log(ip)
       let visit = visits[ip];
@@ -141,7 +141,7 @@ fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, async (curr
         let reqs = visit.apps[app];
         reqs.forEach(req => {
           const { path, time, bytes } = req;
-          console.log(`CALL insert_visit(?, ?, ?, ?, ?, ?, ?, ?), ${[ip, app, country, region, city, time, bytes, path]}`);
+          // console.log(`CALL insert_visit(?, ?, ?, ?, ?, ?, ?, ?), ${[ip, app, country, region, city, time, bytes, path]}`);
           conn.execute(`CALL insert_visit(?, ?, ?, ?, ?, ?, ?, ?)`, [ip, app, country, region, city, time, bytes, path], (err, results, fields) => {
             if (err) {
               console.log(`error: ${err}`);
