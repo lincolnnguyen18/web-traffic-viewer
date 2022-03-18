@@ -16,8 +16,14 @@ export default {
     clearSearch() {
       this.search = ''
       this.$refs.searchInput.focus()
-      this.loadVisits();
-      this.$refs.table.scrollTop = 0
+      this.loadVisits().then(() => {
+        this.$refs.table.scrollTop = 0
+      })
+    },
+    doSearch() {
+      this.loadVisits().then(() => {
+        this.$refs.table.scrollTop = 0
+      })
     },
     setMode(mode) {
       this.mode = mode
@@ -160,7 +166,7 @@ export default {
 
 <template>
 <div class="search" ref="search" :class="{'focus-search': searchFocused, 'disabled': this.mode === 'focus'}">
-  <span class="material-icons-round search-button" @click="loadVisits">search</span>
+  <span class="material-icons-round search-button" @click="doSearch">search</span>
   <input type="search" placeholder="Search" v-model="search" @keyup.enter="loadVisits" @submit.prevent="loadVisits" @input="checkEmptySearch" @focus="focusSearch" @blur="focusSearch" ref="searchInput">
   <span class="material-icons-round search-button clear" @click="clearSearch" ref="clear" :class="{'hidden': search === ''}">close</span>
 </div>
