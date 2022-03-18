@@ -1,0 +1,9 @@
+{
+  "name": "prototype",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "dotted-map": "^2.2.3"
+  }
+}

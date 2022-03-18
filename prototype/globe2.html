@@ -1,0 +1,27 @@
+<head>
+  <style> body { margin: 0; } </style>
+
+  <script src="//unpkg.com/globe.gl"></script>
+  <!--<script src="../../dist/globe.gl.js"></script>-->
+</head>
+
+<body>
+<div id="globeViz"></div>
+
+<script>
+  fetch('/test.json').then(res => res.json()).then(places => {
+    Globe()
+      .globeImageUrl('//unpkg.com/three-globe@2.24.3/example/img/earth-blue-marble.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .labelsData(places.features)
+      .labelLat(d => d.properties.latitude)
+      .labelLng(d => d.properties.longitude)
+      .labelText(d => '')
+      .labelSize(2)
+      .labelDotRadius(1)
+      .labelColor(() => '#9BFF71')
+      .labelResolution(2)
+    (document.getElementById('globeViz'))
+  });
+</script>
+</body>

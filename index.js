@@ -5,6 +5,9 @@ import fs from 'fs';
 import cors from 'cors';
 import fetch from 'node-fetch';
 import mysql from 'mysql2';
+// const DottedMap = require('dotted-map').default;
+import DottedMap from 'dotted-map';
+// DottedMap = DottedMap.default;
 import util from 'util';
 const conn = mysql.createConnection({
   host: 'localhost',
@@ -71,16 +74,16 @@ fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, async (curr
   if (log.trim()) {
     let visits = {};
     logLines.forEach(line => {
-      console.log(`line: ${line}`);
+      // console.log(`line: ${line}`);
       let textAfterThirdColon = line.substring(getPosition(line, ':', 3) + 1).trim();
       // console.log(`textAfterThirdColon): ${textAfterThirdColon}`);
       let json = `[${textAfterThirdColon}]`;
-      // console.log(json)
+      // console.log(`json: ${json}`);
       let parsed;
       try {
         parsed = JSON.parse(json);
       } catch (e) {
-        console.log(`error parsing json: ${e}`);
+        // console.log(`error parsing json: ${e}`);
         return;
       }
       // console.log(parsed)
@@ -117,11 +120,12 @@ fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, async (curr
     const res = await Promise.all(fetchArray);
     const data = await Promise.all(res.map(r => r.json()));
     data.forEach(result => {
-      const { country, city, region } = result;
+      const { country, city, region, ll } = result;
       const ip = result.ip;
       visits[ip].country = country;
       visits[ip].city = city;
       visits[ip].region = region;
+      visits[ip].ll = ll;
     });
     // console.log(util.inspect(visits, false, null, true));
     Object.keys(visits).forEach(ip => {
@@ -136,13 +140,15 @@ fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, async (curr
       let city = visit.city ? visit.city : 'N/A';
       let region = visit.region ? visit.region : 'N/A';
       let apps = Object.keys(visit.apps);
+      let latitude = visit.ll ? visit.ll[0] : null;
+      let longitude = visit.ll ? visit.ll[1] : null;
       apps.forEach(app => {
         // CREATE PROCEDURE insert_visit(_ip TEXT, _app TEXT, _country TEXT, _region TEXT, _city TEXT, _time TEXT, _bytes INTEGER, _path TEXT) BEGIN
         let reqs = visit.apps[app];
         reqs.forEach(req => {
           const { path, time, bytes } = req;
           // console.log(`CALL insert_visit(?, ?, ?, ?, ?, ?, ?, ?), ${[ip, app, country, region, city, time, bytes, path]}`);
-          conn.execute(`CALL insert_visit(?, ?, ?, ?, ?, ?, ?, ?)`, [ip, app, country, region, city, time, bytes, path], (err, results, fields) => {
+          conn.execute(`CALL insert_visit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [ip, app, country, region, city, time, bytes, path, latitude, longitude], (err, results, fields) => {
             if (err) {
               console.log(`error: ${err}`);
             }
@@ -197,6 +203,31 @@ app.get('/getDetails', (req, res) => {
       }
     });
   }
+});
+
+app.get('/getMap', (req, res) => {
+  conn.execute('CALL get_latitude_longitude_past_month()', (err, results, fields) => {
+    if (err) {
+      console.log(`error: ${err}`);
+    } else {
+      let points = results[0];
+      const map = new DottedMap.default({ height: 60, grid: 'diagonal' });
+      points.forEach(point => {
+        map.addPin({
+          lat: point.latitude,
+          lng: point.longitude,
+          svgOptions: { color: '#9BFF71', radius: 0.7 }
+        });
+      });
+      const svgMap = map.getSVG({
+        radius: 0.22,
+        color: '#423B38',
+        shape: 'circle',
+        backgroundColor: '#020300',
+      });
+      res.send(svgMap);
+    }
+  });
 });
 
 const port = 7008;

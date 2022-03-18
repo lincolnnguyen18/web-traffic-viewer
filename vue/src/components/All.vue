@@ -91,6 +91,11 @@ export default {
               detail.app = app
             })
             this.setMode('focus')
+            // this.$refs.focus_table.style.visibility = 'hidden'
+            setTimeout(() => {
+              this.$refs.focus_table.scrollTop = 0
+              // this.$refs.focus_table.style.visibility = 'visible'
+            }, 1)
           })
       } else {
         this.openIp(ip)
@@ -201,10 +206,11 @@ export default {
     <span>Path</span>
     <span class="material-icons-outlined close" @click="setMode('all')">close</span>
   </div>
-  <div class="table-rows">
+  <div class="table-rows" ref="focus_table">
     <div class="table-row table-row-only" v-for="detail in details" :key="detail.id">
       <span>{{detail.date}}</span>
-      <span class="ip" @click="openIp(detail.ip)">{{detail.ip}}</span>
+      <span>{{detail.ip}}</span>
+      <!-- <span class="ip" @click="openIp(detail.ip)">{{detail.ip}}</span> -->
       <span>{{detail.app}}</span>
       <span>{{detail.time}}</span>
       <span>{{detail.bytes}}</span>

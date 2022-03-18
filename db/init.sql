@@ -15,6 +15,8 @@ CREATE TABLE visit (
   country TEXT,
   region TEXT,
   city TEXT,
+  latitude FLOAT,
+  longitude FLOAT,
   time INTEGER DEFAULT 0,
   bytes INTEGER DEFAULT 0
 );
@@ -52,12 +54,12 @@ CREATE VIEW ips_by_total_visits AS
 
 DELIMITER //
 
-CREATE PROCEDURE insert_visit(_ip TEXT, _app TEXT, _country TEXT, _region TEXT, _city TEXT, _time TEXT, _bytes INTEGER, _path TEXT) BEGIN
+CREATE PROCEDURE insert_visit(_ip TEXT, _app TEXT, _country TEXT, _region TEXT, _city TEXT, _time TEXT, _bytes INTEGER, _path TEXT, _latitude FLOAT, _longitude FLOAT) BEGIN
   -- get id of visit with same values created in past hour
   SET @visit_id := (SELECT id FROM visit WHERE ip = _ip AND app = _app AND most_recent_date > DATE_SUB(NOW(), INTERVAL 1 HOUR) ORDER BY id DESC LIMIT 1);
   -- if visit_id doesn't exist then insert new visit
   IF @visit_id IS NULL THEN
-    INSERT INTO visit (ip, app, country, region, city) VALUES (_ip, _app, _country, _region, _city);
+    INSERT INTO visit (ip, app, country, region, city, latitude, longitude) VALUES (_ip, _app, _country, _region, _city, _latitude, _longitude);
     SET @visit_id := LAST_INSERT_ID();
   END IF;
   -- update visit by setting time to max of time and _time, date to current time stamp and bytes to bytes + _bytes
@@ -112,6 +114,10 @@ CREATE PROCEDURE get_ips_by_total_visits(_order_direction TEXT, _continue_id INT
       SELECT * FROM ips_by_total_visits WHERE id < _continue_id ORDER BY id DESC LIMIT 15;
     END IF;
   END IF;
+END//
+
+CREATE PROCEDURE get_latitude_longitude_past_month() BEGIN
+  SELECT DISTINCT latitude, longitude FROM visit WHERE most_recent_date > DATE_SUB(NOW(), INTERVAL 1 MONTH) AND latitude IS NOT NULL AND longitude IS NOT NULL;
 END//
 
 DELIMITER ;
