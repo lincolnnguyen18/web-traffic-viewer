@@ -216,14 +216,17 @@ app.get('/getMap', (req, res) => {
         map.addPin({
           lat: point.latitude,
           lng: point.longitude,
-          svgOptions: { color: '#9BFF71', radius: 0.7 }
+          svgOptions: { color: '#fff', radius: 0.2 }
+          // svgOptions: { color: '#000', radius: 0.2 }
         });
       });
       const svgMap = map.getSVG({
-        radius: 0.22,
-        color: '#423B38',
+        radius: 0.2,
+        color: '#35302E',
+        // color: '#e0e4e5',
         shape: 'circle',
-        backgroundColor: '#020300',
+        backgroundColor: '#000',
+        // backgroundColor: '#fff',
       });
       res.send(svgMap);
     }
