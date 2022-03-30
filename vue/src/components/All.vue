@@ -224,6 +224,9 @@ export default {
     </div>
   </div>
 </div>
+<div class="buttons">
+  <span class="material-icons-outlined"><a href="/map.svg" target="_blank">public</a></span>
+</div>
 </template>
 
 <style scoped>

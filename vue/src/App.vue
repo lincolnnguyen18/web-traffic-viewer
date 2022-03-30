@@ -62,10 +62,17 @@ html, body, #app {
   margin-top: 16px;
   margin-right: 16px;
 }
+.buttons a {
+  color: #bbb;
+  text-decoration: none;
+}
 .buttons span {
   font-size: 32px;
   user-select: none;
   cursor: pointer;
+}
+.buttons a:hover {
+  color: #333;
 }
 .active {
   color: #000;
