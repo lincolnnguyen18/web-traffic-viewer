@@ -9,21 +9,32 @@ export default {
       details: [],
       refreshing: false,
       altDown: false,
-      searchFocused: false
+      searchFocused: false,
+      lastSearch: '',
     }
   },
   methods: {
     clearSearch() {
       this.search = ''
+      this.lastSearch = ''
       this.$refs.searchInput.focus()
       this.loadVisits().then(() => {
         this.$refs.table.scrollTop = 0
       })
     },
     doSearch() {
-      this.loadVisits().then(() => {
-        this.$refs.table.scrollTop = 0
-      })
+      if (this.search == '') {
+        this.clearSearch()
+        return
+      }
+      this.$refs.searchInput.focus()
+      console.log(this.lastSearch, this.search)
+      if (this.lastSearch != this.search) {
+        this.lastSearch = this.search
+        this.loadVisits().then(() => {
+          this.$refs.table.scrollTop = 0
+        })
+      }
     },
     setMode(mode) {
       this.mode = mode
@@ -90,7 +101,7 @@ export default {
           .then(res => res.json())
           .then(data => {
             data = this.reformatDetails(data)
-            console.log(data)
+            // console.log(data)
             this.details = data
             data.forEach(detail => {
               detail.ip = ip
@@ -132,7 +143,7 @@ export default {
     },
     checkEmptySearch() {
       if (this.search === '') {
-        this.loadVisits()
+        this.clearSearch()
       }
     },
     refresh: async function () {
@@ -167,7 +178,7 @@ export default {
 <template>
 <div class="search" ref="search" :class="{'focus-search': searchFocused, 'disabled': this.mode === 'focus'}">
   <span class="material-icons-round search-button" @click="doSearch">search</span>
-  <input type="search" placeholder="Search" v-model="search" @keyup.enter="loadVisits" @submit.prevent="loadVisits" @input="checkEmptySearch" @focus="focusSearch" @blur="focusSearch" ref="searchInput">
+  <input type="search" placeholder="Search" v-model="search" @keyup.enter="doSearch" @submit.prevent="loadVisits" @input="checkEmptySearch" @focus="focusSearch" @blur="focusSearch" ref="searchInput">
   <span class="material-icons-round search-button clear" @click="clearSearch" ref="clear" :class="{'hidden': search === ''}">close</span>
 </div>
 <div class="all" v-show="mode == 'all'">
