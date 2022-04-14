@@ -60,6 +60,8 @@ function getAppName(app) {
       return `rapid-tracing2`;
     case 'd10':
       return 'web-traffic-viewer';
+    case 'd11':
+      return 'work-rest-timer';
     default:
       return `unknown`;
   }
@@ -99,6 +101,7 @@ fs.watchFile('../haproxy.log', { persistent: true, interval: 1000 }, async (curr
       let Ta = parsed[8];
       let TR = parsed[9];
       // console.log(Tt, Tq, Tw, Tc, Tr, Ta, TR);
+      if (getAppName(app) == 'unknown') return;
       let appName = `${app}: ${getAppName(app)}`;
       let bytes = parsed[4];
       // console.log(ip, path, time, appName, bytes);
